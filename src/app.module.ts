@@ -10,6 +10,9 @@ import * as Joi from 'joi';
 @Module({
   imports: [
     ConfigModule.forRoot({
+      isGlobal: true, // ConfigModule 전역 모듈로 설정
+      envFilePath: '.env',
+
       validationSchema: Joi.object({
         POSTGRES_HOST: Joi.string().required(),
         POSTGRES_PORT: Joi.number().required(),
