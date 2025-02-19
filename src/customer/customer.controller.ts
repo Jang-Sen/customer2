@@ -1,34 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CustomerService } from './customer.service';
+import { ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import { Customer } from './entities/customer.entity';
 import { CreateCustomerDto } from './dto/create-customer.dto';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Controller('customer')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
   @Post()
-  create(@Body() createCustomerDto: CreateCustomerDto) {
-    return this.customerService.create(createCustomerDto);
+  @ApiOperation({ summary: '고객 생성' })
+  @ApiConsumes('application/x-www-form-urlencoded')
+  async create(@Body() dto: CreateCustomerDto): Promise<Customer> {
+    return await this.customerService.createCustomer(dto);
   }
 
-  @Get()
-  findAll() {
-    return this.customerService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.customerService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCustomerDto: UpdateCustomerDto) {
-    return this.customerService.update(+id, updateCustomerDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.customerService.remove(+id);
+  @Get('/:id')
+  @ApiOperation({ summary: '고객 조회' })
+  async getCustomer(@Param('id') id: string): Promise<Customer> {
+    return await this.customerService.getCustomer(id);
   }
 }

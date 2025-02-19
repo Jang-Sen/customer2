@@ -1,26 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Customer } from './entities/customer.entity';
+import { Repository } from 'typeorm';
 import { CreateCustomerDto } from './dto/create-customer.dto';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomerService {
-  create(createCustomerDto: CreateCustomerDto) {
-    return 'This action adds a new customer';
+  constructor(
+    @InjectRepository(Customer)
+    private readonly repository: Repository<Customer>,
+  ) {}
+
+  // 등록
+  async createCustomer(dto: CreateCustomerDto): Promise<Customer> {
+    const customer = this.repository.create(dto);
+
+    return await this.repository.save(customer);
   }
 
-  findAll() {
-    return `This action returns all customer`;
-  }
+  // 조회
+  async getCustomer(id: string): Promise<Customer> {
+    const customer = await this.repository.findOneBy({ id });
 
-  findOne(id: number) {
-    return `This action returns a #${id} customer`;
-  }
+    if (!customer) {
+      throw new NotFoundException('존재하지 않습니다.');
+    }
 
-  update(id: number, updateCustomerDto: UpdateCustomerDto) {
-    return `This action updates a #${id} customer`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} customer`;
+    return customer;
   }
 }
